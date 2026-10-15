@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maamulka Dukaanka</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);--bg:#f1f4f3;--card:#fff;--ink:#17262b;--mute:#5d6f73;--line:#d8e0de;--pri:#0f5c4d;--onpri:#fff;--acc:#c98a0b;--bad:#b3261e;--good:#12744f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10181a;--card:#182326;--ink:#e6eeed;--mute:#93a6a9;--line:#2a3a3d;--pri:#3fb89f;--onpri:#06231d;--acc:#e5ab36;--bad:#ff8a80;--good:#5fd6a4}}
+:root[data-theme="dark"]{--bg:#10181a;--card:#182326;--ink:#e6eeed;--mute:#93a6a9;--line:#2a3a3d;--pri:#3fb89f;--onpri:#06231d;--acc:#e5ab36;--bad:#ff8a80;--good:#5fd6a4}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Hind Siliguri","Segoe UI",system-ui,sans-serif;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+header{padding:18px 16px 6px;max-width:760px;margin:0 auto}
+h1{font-size:1.5rem;margin:0;letter-spacing:-.01em}
+h2{font-size:1.1rem;margin:22px 0 8px}
+main{max-width:760px;margin:0 auto;padding:0 16px 24px}
+.sub{color:var(--mute);margin:2px 0 0;font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.full{grid-column:1/-1}
+label{display:block;font-size:.85rem;color:var(--mute);margin-bottom:3px}
+input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;min-height:44px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+.btn{background:var(--pri);color:var(--onpri);border:0;border-radius:8px;padding:11px 16px;font:inherit;font-weight:600;min-height:44px;cursor:pointer;width:100%}
+.btn.ghost{background:transparent;color:var(--bad);border:1px solid var(--line);width:auto;padding:4px 10px;min-height:32px;font-weight:500}
+.scroll{overflow-x:auto;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mute);font-weight:500;font-size:.82rem}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.low{color:var(--bad);font-weight:600}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.stat b{display:block;font-size:1.3rem;font-variant-numeric:tabular-nums}
+.stat span{color:var(--mute);font-size:.84rem}
+.stat.profit b{color:var(--good)}.stat.neg b{color:var(--bad)}
+.empty{color:var(--mute);padding:14px 4px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:none;border:0;color:var(--mute);font:inherit;font-size:.82rem;padding:10px 2px;min-height:56px;cursor:pointer;border-top:3px solid transparent}
+nav button[aria-selected="true"]{color:var(--pri);border-top-color:var(--pri);font-weight:700}
+section[hidden]{display:none}
+#msg{color:var(--bad);font-size:.88rem;min-height:1.2em;margin:8px 0 0}
+.bars{display:flex;gap:8px;height:150px;margin-top:6px}.bar{flex:1;display:flex;flex-direction:column;align-items:center;font-size:.72rem;color:var(--mute);min-width:0}.bar .col{flex:1;display:flex;align-items:flex-end;width:100%}.bar i{display:block;width:100%;background:var(--pri);border-radius:4px 4px 0 0;min-height:2px}.bar em{font-style:normal;margin-bottom:2px;font-variant-numeric:tabular-nums}.bar span{margin-top:4px}.bar.today i{background:var(--acc)}.pill{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:3px 10px;margin:3px 4px 0 0;font-size:.85rem}.pill b{color:var(--bad)}
+</style>
+</head>
+<body>
+<header><h1>Maamulka Dukaanka</h1><p class="sub" id="today"></p></header>
+<main>
+
+<section id="dash">
+  <h2>Dashboard</h2>
+  <div class="stats" id="dStats"></div>
+  <h2>Iibka 7-dii maalmood ee la soo dhaafay</h2>
+  <div class="card" id="dChart"></div>
+  <h2>Alaabta dhammaanaysa</h2>
+  <div class="card" id="dLow"></div>
+  <h2>Alaabta ugu iibka badan</h2><div class="scroll" id="dTop"></div>
+  <h2>Iibkii ugu dambeeyay</h2><div class="scroll" id="dRecent"></div>
+</section>
+
+<section id="inv" hidden>
+  <h2>Kaydka alaabta</h2>
+  <div class="card grid">
+    <div class="full"><label for="iName">Magaca alaabta</label><input id="iName"></div>
+    <div><label for="iPart">Part Number</label><input id="iPart"></div>
+    <div><label for="iQty">Tirada kaydka</label><input id="iQty" type="number" min="0" inputmode="numeric"></div>
+    <div><label for="iCost">Qiimaha iibsiga ($)</label><input id="iCost" type="number" min="0" step="0.01" inputmode="decimal"></div>
+    <div><label for="iPrice">Qiimaha iibka ($)</label><input id="iPrice" type="number" min="0" step="0.01" inputmode="decimal"></div>
+    <div class="full"><button class="btn" id="addItem">Ku dar alaabta</button><p id="msg1" class="sub" style="color:var(--bad)"></p></div>
+  </div>
+  <div class="scroll" id="invTable"></div>
+</section>
+
+<section id="sal" hidden>
+  <h2>Iibka</h2>
+  <div class="card grid">
+    <div class="full"><label for="sItem">Alaabta</label><select id="sItem"></select></div>
+    <div><label for="sQty">Tirada la iibiyey</label><input id="sQty" type="number" min="1" value="1" inputmode="numeric"></div>
+    <div><label for="sPrice">Qiimaha halkii ($)</label><input id="sPrice" type="number" min="0" step="0.01" inputmode="decimal"></div>
+    <div class="full"><label for="sPaid">Lacagta la helay ($)</label><input id="sPaid" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Eber ha ahaato haddii deyn tahay"></div>
+    <div class="full"><p class="sub" id="sTotal" style="margin:0">Wadarta: $0.00</p></div>
+    <div class="full"><button class="btn" id="addSale">Diiwaangeli iibka</button><p id="msg2" class="sub" style="color:var(--bad)"></p></div>
+  </div>
+  <div class="scroll" id="salTable"></div>
+</section>
+
+<section id="acc" hidden>
+  <h2>Xisaabaadka</h2>
+  <div class="stats" id="accStats"></div>
+  <h2>Kharash cusub</h2>
+  <div class="card grid">
+    <div class="full"><label for="eDesc">Sharaxaad (kiro, mushahar, korontada...)</label><input id="eDesc"></div>
+    <div class="full"><label for="eAmt">Qadarka ($)</label><input id="eAmt" type="number" min="0" step="0.01" inputmode="decimal"></div>
+    <div class="full"><button class="btn" id="addExp">Ku dar kharashka</button><p id="msg3" class="sub" style="color:var(--bad)"></p></div>
+  </div>
+  <div class="scroll" id="expTable"></div>
+</section>
+
+<section id="rep" hidden>
+  <h2>Warbixinnada</h2>
+  <div class="stats" id="repStats"></div>
+  <h2>Warbixinta iibka</h2><div class="scroll" id="repSales"></div>
+  <h2>Warbixinta kaydka</h2><div class="scroll" id="repStock"></div>
+  <h2>Faa'iidada alaab kasta</h2><div class="scroll" id="repProfit"></div>
+</section>
+
+</main>
+<nav role="tablist">
+  <button role="tab" data-t="dash" aria-selected="true">Guud</button>
+  <button role="tab" data-t="inv" aria-selected="false">Kayd</button>
+  <button role="tab" data-t="sal" aria-selected="false">Iib</button>
+  <button role="tab" data-t="acc" aria-selected="false">Xisaab</button>
+  <button role="tab" data-t="rep" aria-selected="false">Warbixin</button>
+</nav>
+
+<script>
+var KEY='dukaan-v1';
+var S={items:[],sales:[],exps:[]};
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.items)S=p;}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function m(n){return '$'+(Number(n)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function day(t){return new Date(t).toLocaleDateString('so-SO',{day:'2-digit',month:'short'})}
+$('today').textContent=new Date().toLocaleDateString('so-SO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+var LOW=5;
+
+function tbl(heads,rows,empty){
+  if(!rows.length)return '<div class="empty">'+empty+'</div>';
+  return '<div class="card" style="padding:4px 8px"><table><thead><tr>'+heads.map(function(h){return '<th'+(h[1]?' class="n"':'')+'>'+h[0]+'</th>'}).join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
+}
+function item(id){return S.items.filter(function(i){return i.id===id})[0]}
+
+function totals(){
+  var rev=0,paid=0,cogs=0;
+  S.sales.forEach(function(s){rev+=s.total;paid+=s.paid;cogs+=s.cost*s.qty});
+  var exp=0;S.exps.forEach(function(e){exp+=e.amt});
+  var stockVal=0;S.items.forEach(function(i){stockVal+=i.cost*i.qty});
+  return {rev:rev,paid:paid,debt:rev-paid,cogs:cogs,exp:exp,gross:rev-cogs,profit:rev-cogs-exp,stockVal:stockVal};
+}
+function stat(label,val,cls){return '<div class="stat '+(cls||'')+'"><b>'+val+'</b><span>'+label+'</span></div>'}
+
+function renderInv(){
+  $('invTable').innerHTML=tbl([['Alaabta'],['Part No.'],['Iibsi',1],['Iib',1],['Kayd',1],['']],
+    S.items.map(function(i){
+      return '<tr><td>'+esc(i.name)+'</td><td>'+esc(i.part||'-')+'</td><td class="n">'+m(i.cost)+'</td><td class="n">'+m(i.price)+'</td><td class="n'+(i.qty<=LOW?' low':'')+'">'+i.qty+'</td><td><button class="btn ghost" data-del-item="'+i.id+'">Tir</button></td></tr>';
+    }),'Weli alaab ma jirto. Ku dar alaabtaada ugu horreysa kor ku jira.');
+  var sel=$('sItem'),cur=sel.value;
+  sel.innerHTML=S.items.length?S.items.map(function(i){return '<option value="'+i.id+'">'+esc(i.name)+(i.part?' ('+esc(i.part)+')':'')+' — kayd: '+i.qty+'</option>'}).join(''):'<option value="">Alaab ma jirto</option>';
+  if(cur&&item(cur))sel.value=cur;
+  fillPrice();
+}
+function fillPrice(){var i=item($('sItem').value);if(i&&document.activeElement!==$('sPrice'))$('sPrice').value=i.price;calcTotal()}
+function calcTotal(){var t=(+$('sQty').value||0)*(+$('sPrice').value||0);$('sTotal').textContent='Wadarta: '+m(t)}
+function renderSales(){
+  $('salTable').innerHTML=tbl([['Taariikh'],['Alaabta'],['Tirada',1],['Wadar',1],['La helay',1],['Deyn',1]],
+    S.sales.slice().reverse().map(function(s){
+      var d=s.total-s.paid;
+      return '<tr><td>'+day(s.t)+'</td><td>'+esc(s.name)+'</td><td class="n">'+s.qty+'</td><td class="n">'+m(s.total)+'</td><td class="n">'+m(s.paid)+'</td><td class="n'+(d>0.004?' low':'')+'">'+m(d)+'</td></tr>';
+    }),'Weli iib lama diiwaangelin.');
+}
+function renderAcc(){
+  var t=totals();
+  $('accStats').innerHTML=stat('Dakhli (iibka wadarta)',m(t.rev))+stat('Lacagta la helay',m(t.paid))+stat('Kharashka',m(t.exp))+stat('Faa\'iido / khasaare',m(t.profit),t.profit>=0?'profit':'neg');
+  $('expTable').innerHTML=tbl([['Taariikh'],['Sharaxaad'],['Qadar',1],['']],
+    S.exps.slice().reverse().map(function(e){
+      return '<tr><td>'+day(e.t)+'</td><td>'+esc(e.desc)+'</td><td class="n">'+m(e.amt)+'</td><td><button class="btn ghost" data-del-exp="'+e.id+'">Tir</button></td></tr>';
+    }),'Weli kharash lama diiwaangelin.');
+}
+function renderRep(){
+  var t=totals();
+  $('repStats').innerHTML=stat('Dakhli',m(t.rev))+stat('Deyn lagu leeyahay',m(t.debt),t.debt>0.004?'neg':'')+stat('Qiimaha kaydka hadda',m(t.stockVal))+stat('Faa\'iido saafi ah',m(t.profit),t.profit>=0?'profit':'neg');
+  var by={};
+  S.sales.forEach(function(s){var k=s.name;by[k]=by[k]||{qty:0,total:0,profit:0};by[k].qty+=s.qty;by[k].total+=s.total;by[k].profit+=s.total-s.cost*s.qty});
+  var keys=Object.keys(by).sort(function(a,b){return by[b].total-by[a].total});
+  $('repSales').innerHTML=tbl([['Alaabta'],['La iibiyey',1],['Dakhli',1]],keys.map(function(k){return '<tr><td>'+esc(k)+'</td><td class="n">'+by[k].qty+'</td><td class="n">'+m(by[k].total)+'</td></tr>'}),'Iib weli ma jiro.');
+  $('repStock').innerHTML=tbl([['Alaabta'],['Part No.'],['Kayd',1],['Qiime',1]],S.items.map(function(i){return '<tr><td>'+esc(i.name)+'</td><td>'+esc(i.part||'-')+'</td><td class="n'+(i.qty<=LOW?' low':'')+'">'+i.qty+'</td><td class="n">'+m(i.cost*i.qty)+'</td></tr>'}),'Kayd ma jiro.');
+  $('repProfit').innerHTML=tbl([['Alaabta'],['Faa\'iido',1]],keys.map(function(k){return '<tr><td>'+esc(k)+'</td><td class="n" style="color:var(--'+(by[k].profit>=0?'good':'bad')+')">'+m(by[k].profit)+'</td></tr>'}),'Iib weli ma jiro.');
+}
+function renderDash(){
+  var t=totals(),now=new Date(),td=now.toDateString(),mo=now.getMonth()+'-'+now.getFullYear(),today=0,month=0;
+  S.sales.forEach(function(s){var d=new Date(s.t);if(d.toDateString()===td)today+=s.total;if(d.getMonth()+'-'+d.getFullYear()===mo)month+=s.total});
+  var low=S.items.filter(function(i){return i.qty<=LOW});
+  $('dStats').innerHTML=stat('Iibka maanta',m(today))+stat('Iibka bishan',m(month))+stat('Faa\'iido saafi ah',m(t.profit),t.profit>=0?'profit':'neg')+stat('Deyn lagu leeyahay',m(t.debt),t.debt>0.004?'neg':'')+stat('Nooca alaabta',S.items.length)+stat('Alaab dhammaanaysa',low.length,low.length?'neg':'');
+  var days=[],mx=0,i,d;
+  for(i=6;i>=0;i--){d=new Date();d.setDate(d.getDate()-i);days.push({k:d.toDateString(),l:d.toLocaleDateString('so-SO',{weekday:'short'}),v:0,today:i===0})}
+  S.sales.forEach(function(s){var k=new Date(s.t).toDateString();days.forEach(function(x){if(x.k===k)x.v+=s.total})});
+  days.forEach(function(x){if(x.v>mx)mx=x.v});
+  $('dChart').innerHTML=mx?'<div class="bars">'+days.map(function(x){return '<div class="bar'+(x.today?' today':'')+'"><em>'+(x.v?Math.round(x.v):'')+'</em><div class="col"><i style="height:'+Math.max(x.v/mx*100,1.5)+'%"></i></div><span>'+x.l+'</span></div>'}).join('')+'</div>':'<div class="empty" style="padding:4px">Weli iib lama diiwaangelin. Tag "Iib" si aad u bilowdo.</div>';
+  $('dLow').innerHTML=low.length?low.map(function(i){return '<span class="pill">'+esc(i.name)+': <b>'+i.qty+'</b></span>'}).join(''):'<div class="empty" style="padding:4px">Dhammaan alaabtu waa ku filan tahay.</div>';
+  var by={};S.sales.forEach(function(s){by[s.name]=by[s.name]||{q:0,t:0};by[s.name].q+=s.qty;by[s.name].t+=s.total});
+  var ks=Object.keys(by).sort(function(a,b){return by[b].t-by[a].t}).slice(0,5);
+  $('dTop').innerHTML=tbl([['Alaabta'],['La iibiyey',1],['Dakhli',1]],ks.map(function(k){return '<tr><td>'+esc(k)+'</td><td class="n">'+by[k].q+'</td><td class="n">'+m(by[k].t)+'</td></tr>'}),'Iib weli ma jiro.');
+  $('dRecent').innerHTML=tbl([['Taariikh'],['Alaabta'],['Tirada',1],['Wadar',1]],S.sales.slice(-5).reverse().map(function(s){return '<tr><td>'+day(s.t)+'</td><td>'+esc(s.name)+'</td><td class="n">'+s.qty+'</td><td class="n">'+m(s.total)+'</td></tr>'}),'Iib weli ma jiro.');
+}
+function all(){renderDash();renderInv();renderSales();renderAcc();renderRep()}
+
+$('addItem').onclick=function(){
+  var n=$('iName').value.trim(),q=parseInt($('iQty').value,10),c=parseFloat($('iCost').value),p=parseFloat($('iPrice').value);
+  if(!n||isNaN(q)||q<0||isNaN(p)||p<0){$('msg1').textContent='Buuxi magaca, tirada iyo qiimaha iibka.';return}
+  S.items.push({id:uid(),name:n,part:$('iPart').value.trim(),qty:q,cost:isNaN(c)?0:c,price:p});
+  save();$('msg1').textContent='';['iName','iPart','iQty','iCost','iPrice'].forEach(function(x){$(x).value=''});all();
+};
+$('addSale').onclick=function(){
+  var i=item($('sItem').value),q=parseInt($('sQty').value,10),pr=parseFloat($('sPrice').value),pd=parseFloat($('sPaid').value);
+  if(!i){$('msg2').textContent='Marka hore alaab ku dar Kaydka.';return}
+  if(isNaN(q)||q<1||isNaN(pr)||pr<0){$('msg2').textContent='Geli tirada iyo qiimaha sax ah.';return}
+  if(q>i.qty){$('msg2').textContent='Kaydka waxaa ku jira '+i.qty+' oo keliya.';return}
+  var total=q*pr;if(isNaN(pd))pd=total;if(pd>total)pd=total;
+  i.qty-=q;
+  S.sales.push({id:uid(),t:Date.now(),itemId:i.id,name:i.name,qty:q,price:pr,cost:i.cost,total:total,paid:pd});
+  save();$('msg2').textContent='';$('sQty').value=1;$('sPaid').value='';all();
+};
+$('addExp').onclick=function(){
+  var d=$('eDesc').value.trim(),a=parseFloat($('eAmt').value);
+  if(!d||isNaN(a)||a<=0){$('msg3').textContent='Geli sharaxaad iyo qadar.';return}
+  S.exps.push({id:uid(),t:Date.now(),desc:d,amt:a});save();$('msg3').textContent='';$('eDesc').value='';$('eAmt').value='';all();
+};
+document.addEventListener('click',function(e){
+  var a=e.target.getAttribute&&e.target.getAttribute('data-del-item');
+  if(a){S.items=S.items.filter(function(i){return i.id!==a});save();all();return}
+  var b=e.target.getAttribute&&e.target.getAttribute('data-del-exp');
+  if(b){S.exps=S.exps.filter(function(x){return x.id!==b});save();all();return}
+  var t=e.target.getAttribute&&e.target.getAttribute('data-t');
+  if(t){['dash','inv','sal','acc','rep'].forEach(function(s){$(s).hidden=s!==t});
+    document.querySelectorAll('nav button').forEach(function(btn){btn.setAttribute('aria-selected',btn.getAttribute('data-t')===t)});window.scrollTo(0,0)}
+});
+$('sItem').onchange=function(){$('sPrice').value='';fillPrice()};
+$('sQty').oninput=calcTotal;$('sPrice').oninput=calcTotal;
+all();
+</script>
+</body>
+</html>
